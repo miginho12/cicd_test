@@ -1,0 +1,32 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main # main 브랜치에 푸시될 때마다 실행
+
+jobs:
+  build:
+    runs-on: ubuntu-latest # 실행할 환경 설정
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2 # 코드 체크아웃
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2 # Node.js 환경 설정
+        with:
+          node-version: "18" # 사용할 Node.js 버전
+
+      - name: Install dependencies
+        run: npm install # 종속성 설치
+
+      - name: Build Docker image
+        run: |
+          docker build -t your-dockerhub-username/my-docker-app .  # Docker 이미지 빌드
+
+      - name: Log in to Docker Hub
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin # Docker Hub 로그인
+
+      - name: Push Docker image
+        run: docker push your-dockerhub-username/my-docker-app # Docker 이미지 푸시
